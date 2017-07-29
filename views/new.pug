@@ -1,0 +1,18 @@
+include partials/header
+
+div(class='container')
+  div(class='row')
+    h2(style='text-align: center;') Create New List Item:
+    div(style='width: 30%; margin: 25px auto;')
+      form(action='/list' method='POST')
+        div(class='form-group')
+          input(class='form-control' type='text' name='artist' placeholder='artist')
+        div(class='form-group')
+          input(class='form-control' type='text' name='song'  placeholder='song')
+        div(class='form-group')
+          input(class='form-control' type='text' name='image'  placeholder='image url')
+        div(class='form-group')
+          button(class='btn btn-lg btn-primary btn-block') Submit!
+      a(href='/list') Back
+
+include partials/footer
