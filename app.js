@@ -1,10 +1,34 @@
-var express = require("express");
-var app = express();
-var bodyParser = require('body-parser');
-var port = 1234;
+var express       = require("express"),
+    app           = express(),
+    bodyParser    = require('body-parser'),
+    port          = 1234,
+    mongoose      = require('mongoose');
 
+mongoose.connect('mongodb://localhost/recit', {useMongoClient: true});
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "pug");
+
+// SCHEMA SET UP
+var listItemSchema = new mongoose.Schema({
+  number: Number,
+  artist: String,
+  song: String,
+  image: String
+});
+
+var ListItem = mongoose.model('ListItem', listItemSchema);
+
+// ListItem.create(
+//   {number: 1, artist: "Frank Ocean", song: "Live @ FYF Fest", image: "http://static.highsnobiety.com/wp-content/uploads/2017/07/27003442/frank-ocean-full-fyf-performance-00-320x192.jpg"},
+//   function(err, listItem){
+//     if (err){
+//       console.log('err - ', err);
+//     } else {
+//       console.log('newly created listItem - ', listItem);
+//     }
+//   }
+// );
+
 
 var list = [
   {number: 1, artist: "Frank Ocean", song: "Live @ FYF Fest", image: "http://static.highsnobiety.com/wp-content/uploads/2017/07/27003442/frank-ocean-full-fyf-performance-00-320x192.jpg"},
@@ -20,9 +44,17 @@ app.get("/", function(req, res){
 });
 
 app.get("/list", function(req, res){
+  // get all list items from db
+  ListItem.find({}, function(err, listItems){
+    if (err){
+      console.log(err);
+    } else {
+      res.render("list", {list: listItems});
+    }
+  })
   // temp array of campground objects...
   
-  res.render("list", {list: list});
+  // res.render("list", {list: list});
 });
 
 // show the form that sends data to post/list route...
@@ -38,9 +70,16 @@ app.post("/list", function(req, res){
   // ^ form input data that's posted
   var newListItem = {number: (list.length + 1), artist: artist, song: song, image: image};
   // get data from form and add to list array
-  list.push(newListItem);
-  // redirect back to list page
-  res.redirect("/list");
+
+  // create new campground and save to db...
+  ListItem.create(newListItem, function(err, newlyCreated){
+    if (err){
+      console.log('err - ', err);
+    } else {
+      // redirect back to list page
+      res.redirect('/list');
+    }
+  })
 });
 
 
