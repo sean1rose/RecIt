@@ -13,22 +13,12 @@ var listItemSchema = new mongoose.Schema({
   number: Number,
   artist: String,
   song: String,
-  image: String
+  image: String,
+  description: String
 });
 
+// take schema/blueprint and create a model, which has methods we can use (such as find() and create())
 var ListItem = mongoose.model('ListItem', listItemSchema);
-
-// ListItem.create(
-//   {number: 1, artist: "Frank Ocean", song: "Live @ FYF Fest", image: "http://static.highsnobiety.com/wp-content/uploads/2017/07/27003442/frank-ocean-full-fyf-performance-00-320x192.jpg"},
-//   function(err, listItem){
-//     if (err){
-//       console.log('err - ', err);
-//     } else {
-//       console.log('newly created listItem - ', listItem);
-//     }
-//   }
-// );
-
 
 var list = [
   {number: 1, artist: "Frank Ocean", song: "Live @ FYF Fest", image: "http://static.highsnobiety.com/wp-content/uploads/2017/07/27003442/frank-ocean-full-fyf-performance-00-320x192.jpg"},
@@ -43,6 +33,7 @@ app.get("/", function(req, res){
   res.render("landing");
 });
 
+// INDEX route - show all list items
 app.get("/list", function(req, res){
   // get all list items from db
   ListItem.find({}, function(err, listItems){
@@ -57,18 +48,21 @@ app.get("/list", function(req, res){
   // res.render("list", {list: list});
 });
 
-// show the form that sends data to post/list route...
+// need 2 routes to send a post request (1 to show form, then 1 route to post to somewhere)
+
+// 1) NEW route - show the form that sends data to post/list route...
 app.get("/list/new", function(req, res){
   res.render("new");
 });
 
-// creates new data/list
+// 2) CREATE route - adds new list item to db
 app.post("/list", function(req, res){
   var artist = req.body.artist;
   var song = req.body.song;
   var image = req.body.image;
+  var description = req.body.description;
   // ^ form input data that's posted
-  var newListItem = {number: (list.length + 1), artist: artist, song: song, image: image};
+  var newListItem = {number: (list.length + 1), artist: artist, song: song, image: image, description: description};
   // get data from form and add to list array
 
   // create new campground and save to db...
@@ -82,6 +76,11 @@ app.post("/list", function(req, res){
   })
 });
 
+// SHOW route - show individual list item
+app.get('/list/:id', function(req, res){
+  console.log('req - ', req.params.id);
+  res.send('this will be the show page');
+});
 
 app.listen(port, function(){
   console.log(port + ' is litty...');
